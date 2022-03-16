@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const baseURL = "http://localhost:5000/items";
+const baseURL = "https://keeper-to.herokuapp.com/items";
+
+// const baseURL = "http://localhost:5000/items"; // when working local
 
 export const getItems = createAsyncThunk("item/getItems", async (_, thunkAPI) => {
   const { rejectWithValue } = thunkAPI;
@@ -34,6 +36,17 @@ export const deleteItems = createAsyncThunk("item/deleteItems", async (id, thunk
   }
 });
 
+export const updateItems = createAsyncThunk("item/updateItems", async (note, thunkAPI) => {
+  const { rejectWithValue } = thunkAPI;
+
+  try {
+    const { data } = await axios.patch(`${baseURL}/${note._id}`, note);
+    return data;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
 export const itemSlice = createSlice({
   name: "item",
   initialState: { value: [], isLoding: false, currentID: null },
@@ -60,6 +73,10 @@ export const itemSlice = createSlice({
     [deleteItems.fulfilled]: (state, action) => {
       state.value = state.value.filter((item) => item._id !== state.currentID);
       state.currentID = null;
+    },
+
+    [updateItems.fulfilled]: (state, action) => {
+      state.value = state.value.map((item) => (item._id === action.payload._id ? action.payload : item));
     },
   },
 });

@@ -14,6 +14,7 @@ const CONNECTION_URL = "mongodb+srv://admin-Abdallah:Abdallah123@cluster0.o8mpl.
 const itemSchema = mongoose.Schema({
   title: String,
   content: String,
+  isDone: { type: Boolean, default: false },
 });
 
 const ItemModel = mongoose.model("item", itemSchema);
@@ -47,6 +48,16 @@ app.delete("/items/:id", async (req, res) => {
   }
   await ItemModel.findByIdAndRemove(id);
   res.json("item deleted successfully !");
+});
+
+app.patch("/items/:id", async (req, res) => {
+  const { id } = req.params;
+  const item = req.body;
+  if (!mongoose.isValidObjectId(id)) {
+    return res.status(404).send("this id is not valid");
+  }
+  const updatedItem = await ItemModel.findByIdAndUpdate(id, item, { new: true });
+  res.json(updatedItem);
 });
 
 mongoose

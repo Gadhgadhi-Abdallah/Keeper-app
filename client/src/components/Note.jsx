@@ -1,17 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
-import { deleteItems } from "../redux-store/itemSlice";
+import { deleteItems, updateItems } from "../redux-store/itemSlice";
 
 function Note({ note }) {
-  const [active, setActive] = useState(false);
   const dispatch = useDispatch();
 
-  function doneClick() {
-    setActive(!active);
-  }
-
   return (
-    <div className={active ? "note active" : "note"}>
+    <div className={note.isDone ? "note active" : "note"}>
       <h1>{note.title}</h1>
       <p>{note.content}</p>
       <button
@@ -21,7 +16,7 @@ function Note({ note }) {
       >
         Delete
       </button>
-      <button className="doneButton" onClick={doneClick}>
+      <button className="doneButton" onClick={() => dispatch(updateItems({ ...note, isDone: !note.isDone }))}>
         Done
       </button>
     </div>
